@@ -1,4 +1,5 @@
 # Hexo Configuration
+
 ## Docs: https://hexo.io/docs/configuration.html
 ## Source: https://github.com/hexojs/hexo/
 
@@ -10,6 +11,7 @@ keywords:
 author: alben.wong
 language: zh-Hans
 timezone: 
+avatar: /images/avatar.jpeg
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
@@ -74,7 +76,6 @@ pagination_dir: page
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 theme: next
-scheme: Pisces
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
