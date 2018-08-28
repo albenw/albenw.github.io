@@ -83,3 +83,7 @@ deploy:
   type: git
   repo: git@github.com:albenw/albenw.github.io.git
   branch: master
+
+# add by me
+admin:
+  deployCommand: './hexo-deploy.sh'

@@ -1,6 +1,14 @@
----
 title: test1
-date: 2018-08-27 14:11:19
-tags: tag2
+tags:
+  - tag2
+categories: []
+date: 2018-08-27 14:11:00
 ---
-![avatar](../images/avatar.jpeg)
+###123123213
+####123123123
+![avatar](/images/avatar.jpeg)
+<img src='/images/avatar.jpeg' width='200px'>
+avatar.jpeg
+![upload successful](/images/pasted-0.png)
+
+![upload successful](/images/qq_bg.png)
