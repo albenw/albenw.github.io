@@ -1,7 +1,9 @@
----
 title: Hello World
-tags: tag1
-categories: cat1
+tags:
+  - index
+categories:
+  - index
+date: 2018-08-27 14:13:00
 ---
 Welcome to [Hexo](https://hexo.io/)! This is your very first post. Check [documentation](https://hexo.io/docs/) for more info. If you get any problems when using Hexo, you can find the answer in [troubleshooting](https://hexo.io/docs/troubleshooting.html) or you can ask me on [GitHub](https://github.com/hexojs/hexo/issues).
 
@@ -36,5 +38,4 @@ More info: [Generating](https://hexo.io/docs/generating.html)
 ``` bash
 $ hexo deploy
 ```
-
 More info: [Deployment](https://hexo.io/docs/deployment.html)

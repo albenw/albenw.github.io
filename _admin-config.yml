@@ -3,6 +3,7 @@ options:
   spellcheck: true
   lineNumbers: true
   askImageFilename: true
+  imagePath: /images
 editor:
   inputStyle: contenteditable
   spellcheck: true
