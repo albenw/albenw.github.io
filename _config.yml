@@ -6,8 +6,8 @@
 # Site
 title: Alben's home
 subtitle: welcome
-description: 
-keywords: 
+description: albenw's blog
+keywords: albenw
 author: alben.wong
 language: zh-Hans
 timezone: 
@@ -15,9 +15,9 @@ avatar: /images/avatar.jpeg
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: https://albenw.github.io
 root: /
-permalink: :year/:month/:day/:title/
+permalink: posts/:abbrlink/
 permalink_defaults:
 
 # Directory
@@ -80,9 +80,10 @@ theme: next
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type: git
+- type: git
   repo: git@github.com:albenw/albenw.github.io.git
   branch: master
+- type: baidu_url_submitter
 
 # add by me
 ## hexo-admin deploy command sh
@@ -91,5 +92,28 @@ admin:
 
 ## minifier
 all_minifier: true
+
+## local search
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 10000
+
+## abbrlink config
+abbrlink:
+  alg: crc32
+  rep: hex
+
+## google sitemap
+sitemap:
+  path: sitemap.xml
+
+## baidu_url_submit
+baidu_url_submit:
+  count: 5
+  host: albenw.github.io
+  token: vPtput1kLeQXl4dq
+  path: baidu_urls.txt
 
 

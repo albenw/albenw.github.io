@@ -1,10 +1,14 @@
+---
 title: Hexo+Github Pages安装部署
 author: alben.wong
 tags:
   - hexo
 categories:
   - hexo
+abbrlink: 3454819c
 date: 2018-09-04 11:45:00
+keywords: hexo github
+description: Hexo+Github Pages入门基础的安装和部署，使用next主题，教你发布第一篇文章。
 ---
 ## 概要
 想低成本的搞一个博客，在网上找了很多参考资料，于是尝试 Hexo+Github Pages 折腾一下。我把自己的搭建过程记录下来，把其中遇到的一些问题也跟大家分享。

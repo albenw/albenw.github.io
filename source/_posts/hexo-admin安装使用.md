@@ -1,10 +1,15 @@
+---
 title: hexo-admin安装使用
 author: alben.wong
 tags:
-  - hexo
+  - hexo-admin
+  - ''
 categories:
   - hexo
+abbrlink: 4ffa5bc6
 date: 2018-09-04 14:47:00
+keywords: hexo admin
+description: hexo-admin是一个很好用hexo管理工具，方便文章的编辑和查看，对插入图片友好。
 ---
 ## 概要
 如果自己编辑 MD 文件的话，确实比较麻烦，你可以用一些 MD 的编辑器，但是在管理 MD 文件上还是操作不方便。  
@@ -13,8 +18,7 @@ date: 2018-09-04 14:47:00
 
 ## 安装过程
 安装过程中可能涉及到一些前提或内容，请参考我的另一篇文章  
-{% post_link Hexo+Github Pages安装部署 Hexo+Github Pages安装部署 %}
-
+{% post_link Hexo-Github-Pages安装部署 Hexo-Github-Pages安装部署 %}
 ### 前提
 基于版本"hexo": "^3.7.0"，"hexo-admin": "^2.3.0"。
 
