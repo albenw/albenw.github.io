@@ -3,10 +3,12 @@ author: alben.wong
 abbrlink: be8242cc
 tags:
   - hexo
+  - hexo高级
 categories:
   - hexo
 keywords: hexo 高级
-description: 本文教大家配置一些hexo的高级功能、包括字数统计，阅读统计、评论功能、站内搜索、如何被google和百度的收录、添加留言板，使你的hexo博客显得更加丰富多彩。
+description: >-
+  本文教大家配置一些hexo的高级功能、包括字数统计，阅读统计、评论功能、站内搜索、如何被google和百度的收录、添加留言板，使你的hexo博客显得更加丰富多彩。
 date: 2018-09-07 11:15:00
 ---
 ## 概要 
