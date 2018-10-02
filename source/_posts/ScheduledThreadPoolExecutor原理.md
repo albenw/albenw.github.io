@@ -6,9 +6,9 @@ tags:
   - 调度线程池
 categories:
   - java
-date: 2018-09-30 17:43:00
 keywords: ScheduledThreadPoolExecutor 调度线程池
 description: 任务调度利器ScheduledThreadPoolExecutor原理解析。
+date: 2018-09-30 17:43:00
 ---
 ## 概要
 ScheduledThreadPoolExecutor 是实现任务调度好工具，它的特点是提供了线程池。
@@ -173,7 +173,12 @@ ScheduledThreadPoolExecutor 的 shutdown 和 shutdownNow 都是直接调用 Thre
 
 <img src="/images/ScheduledThreadPoolExecutor原理__20.png" width="550px" height="250px">
 
-原来 DealyQueue 的做法是需要遍历数组找出元素的下标（如果元素不是 ScheduledFutureTask 类型也是这样做），这是 O(n) 的。
+原来 DealyQueue 的做法是遍历数组找出元素的下标（如果元素不是 ScheduledFutureTask 类型也是这样做）+ 堆操作：  
+O(n) + O(log n) 约等于 O(n) . 
+DelayedWorkQueue 的操作变为直接取出下标 + 堆操作：  
+O(1) + O(log n) 约等于 O(log n) 
+
+总的时间复杂度从 O(n) -> O(log n)
 
 ## 总结
 ScheduledThreadPoolExecutor的实现跟 ThreadPoolExecutor类似，它利用了延迟队列 DealyQueue 对任务进行延迟运行。
