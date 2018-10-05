@@ -92,6 +92,31 @@ admin:
 
 ## minifier
 all_minifier: true
+html_minifier:
+  enable: true
+  ignore_error: false
+  exclude:
+  
+css_minifier:
+  enable: true
+  exclude: 
+    - '*.min.css'
+
+js_minifier:
+  enable: true
+  mangle: true
+  output:
+  compress:
+  exclude: 
+    - '*.min.js'
+
+image_minifier: 
+  enable: false # 图片不压缩
+  interlaced: false
+  multipass: false
+  optimizationLevel: 2
+  pngquant: false
+  progressive: false
 
 ## local search
 search:
@@ -115,5 +140,11 @@ baidu_url_submit:
   host: albenw.github.io
   token: vPtput1kLeQXl4dq
   path: baidu_urls.txt
+
+prism_plugin:
+  mode: 'preprocess'    # realtime/preprocess
+  theme: 'default'
+  line_number: false    # default false
+  custom_css: 'path/to/your/custom.css'     # optional
 
 
