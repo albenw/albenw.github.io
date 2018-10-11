@@ -147,4 +147,6 @@ prism_plugin:
   line_number: false    # default false
   custom_css: 'path/to/your/custom.css'     # optional
 
+nofollow:
+   enable: true
 
