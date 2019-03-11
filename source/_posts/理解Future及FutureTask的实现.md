@@ -176,6 +176,9 @@ public void run() {
     }
 ```
 
+值得注意的是，如果原来的callable任务运行异常了，那么在run方法中会直接catch掉，然后在get的时候才抛出来。这么也是为了做错误隔离，为了callable的异常不会影响到future的运行。
+
+
 #### setException方法
 ```java
 protected void setException(Throwable t) {
@@ -441,6 +444,23 @@ public boolean cancel(boolean mayInterruptIfRunning) {
         return true;
     }
 ```
+
+## 缺点
+FutureTask有明显的下面两个缺点：
+
+1. 重复提交  
+并发会有重复提交的可能，虽然在内部有对状态NEW的判断，但那只是针对那个FutureTask实例的，我们看到，在submit方法中每次提交任务都会new 一个
+FutureTask出来的。  
+不过现在已经有一个解决方案[Memoizer](http://jcip.net/listings/Memoizer.java)  
+其实很简单，就是用一个key来记录这次的Future，然后放在一个Map里，下次用到时再从Map里取出来。
+
+
+2. 批量任务  
+Future每次只能提交一个任务，而且获取结果之前会一直阻塞，这点也是很不友好的。
+
+
+综上，FutureTask只是提供了一个基本的功能实现，远远不能满足要求高的我们，guava的ListenableFuture和JDK1.8的CompletableFuture都是对Future的增强，前者提供监听器处理结果，后者更加强大，提供链式调用，同步、异步结果返回不同的组合方式来帮助你处理复杂的业务场景。
+
 
 
 ## 总结
