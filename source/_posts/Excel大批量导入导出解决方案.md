@@ -41,6 +41,8 @@ Java对Excel的操作一般都是用POI，但是数据量大的话可能会导�
 ![upload successful](/images/Excel大批量导入导出解决方案__3.png)
 
 ## 导出优化
+事例源码基于POI3.17版本
+
 ### XLSX
 由于xlsx底层使用xml存储，占用内存会比较大，官方也意识到这个问题，在3.8版本之后，提供了SXSSFWorkbook来优化写性能。[官方说明](https://poi.apache.org/components/spreadsheet/how-to.html#sxssf)
 
