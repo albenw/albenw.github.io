@@ -94,6 +94,14 @@ slf4j已经对错误作了说明[官网说明](https://www.slf4j.org/codes.html)
 ### Multiple bindings
 找到多个日志实现，slf4j会找其中一个作为日志实现。
 
+## 代码规范
+阿里对此的代码规范：
+
+>【强制】应用中不可直接使用日志系统（Log4j、Logback）中的 API，而应依赖使用日志框架 SLF4J 中的 API，使用门面模式的日志框架，有利于维护和各个类的日志处理方式统一。
+import org.slf4j.Logger; 
+import org.slf4j.LoggerFactory; 
+private static final Logger logger = LoggerFactory.getLogger(Abc.class); 
+
 ## 总结
 文章帮大家梳理了Java日志组件的关系，以及如何解决日常中常见日志相关的问题，希望对大家帮助。
 
