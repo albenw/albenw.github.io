@@ -534,6 +534,10 @@ Worker继承Runnable，我们看run方法
         }
 ```
 
+### 图解
+画了个图给大家体会一下
+![upload successful](/images/HashedWheelTimer时间轮原理分析__2.png)
+
 ### MpscQueue队列
 HashedWheelTimer用到的`timeouts`和`cancelledTimeouts`都是一种`MpscQueue`队列的数据结构。
 MpscQueue全称Multi-Producer Single-Consumer Queue，从名字看出，是一种适合于多个生产者，单个消费者的高并发场景的高性能的，无锁的队列，原来Netty是自己实现了一个，但在最新的版本用了JCTools的，大家有兴趣可以了解一下。
@@ -543,14 +547,13 @@ MpscQueue全称Multi-Producer Single-Consumer Queue，从名字看出，是一�
 当时间跨度很大时，提升单层时间轮的 tickDuration 可以减少空转次数，但会导致时间精度变低，层级时间轮既可以避免精度降低，又避免了指针空转的次数。如果有时间跨度较长的定时任务，则可以交给层级时间轮去调度。
 设想一下一个定时了 3 天，10 小时，50 分，30 秒的定时任务，在 tickDuration = 1s 的单层时间轮中，需要经过：3246060+106060+5060+30 次指针的拨动才能被执行。但在 wheel1 tickDuration = 1 天，wheel2 tickDuration = 1 小时，wheel3 tickDuration = 1 分，wheel4 tickDuration = 1 秒 的四层时间轮中，只需要经过 3+10+50+30 次指针的拨动。
 
-如图所示
+如图所示:
 ![upload successful](/images/HashedWheelTimer时间轮原理分析__1.png)
 
 ## 缺点
 HashedWheelTimer也有一些缺点，在使用场景上要注意一下
 - Netty的HashedWheelTimer只支持单层的时间轮
 - 当前一个任务执行时间过长的时候，会影响后续任务的到期执行时间的，也就是说其中的任务是串行执行的，所以，要求里面的任务都要短平快
-- 
 
 ## 延迟任务方案对比
 HashedWheelTimer本质上也是一个延迟队列，我们跟其他延迟类解决方案对比一下
