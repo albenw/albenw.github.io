@@ -4,12 +4,14 @@ abbrlink: dfdb52be
 tags:
   - aqs
   - AbstractQueuedSynchronizer
+  - juc
 categories:
   - java
   - juc
-date: 2019-03-31 16:08:00
 keywords: aqs AbstractQueuedSynchronizer 源码 juc
-description: AQS即AbstractQueuedSynchronizer，作为Java的juc（java.util.concurrent）包的核心基础类，为其他并发容器、工具类提供了底层的实现基础。
+description: >-
+  AQS即AbstractQueuedSynchronizer，作为Java的juc（java.util.concurrent）包的核心基础类，为其他并发容器、工具类提供了底层的实现基础。
+date: 2019-03-31 16:08:00
 ---
 ## 概要
 AQS即AbstractQueuedSynchronizer，作为Java的`JUC`（java.util.concurrent）包的核心基础类，为其他并发容器、工具类提供了底层的实现基础。本文讲述AQS的实现原理，以及如何使用AQS。
