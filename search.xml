@@ -3,7 +3,7 @@
   <entry>
     <title><![CDATA[Code Review方案]]></title>
     <url>%2Fposts%2F4f7bd265%2F</url>
-    <content type="text"><![CDATA[概要Code Review是软件工程中重要的一环，特别是在大公司规范的流程中。大家也逐渐意识到Code Review的重要性以及它带来的好处，本文跟大家讨论一下Code Review的实践方案。作用Code Review的好处有很多，巴拉巴拉可以说一堆，但总的来说有以下几点：找bug提高代码质量相互学习实践方案Code Review并没有一个标准应该怎么去做，每个公司甚至每个团队可能都有自己的做法，下面我讲3种暂时看到的做用 gerrit之前用过一下，觉得比较麻烦，主要是流程上体验不好，commit 之后要CR通过才能真正的提交到 gitlab，如果进度比较赶或者多人协作，别人需要用到你的代码，这就会带来时间上的拖延Commit + Issue + Label1）添加Project Label：Review Done；2）设置做Code Review的默认分支Default branch，在Project Setting里面修改；3）通知团队，新任务，使用Issue登记内容，代码Commit时，填写“#Num”关联Issue；4）做完Code Review后，在Issue打上标签Review Done，并close issue，完成整个任务的流程；5）后续我们将会研讨其他Gitlab Review Tool，来协助大家更好的做好Code Review；Merge Request + Label在mr里面，reivew完代码直接打上标签；总结我个人推荐方案2我觉得主要区别在CR的时间点上，gerrit 在每一次的提交，这个比较强制了，不够灵活；方案3要在合并到别的分支时；方案2则比较灵活。具体更详细的实践可以参考基于 GitLab 的简单项目管理与协作流程]]></content>
+    <content type="text"><![CDATA[概要Code Review是软件工程中重要的一环，特别是在大公司规范的流程中。大家也逐渐意识到Code Review的重要性以及它带来的好处，本文跟大家讨论一下Code Review的实践方案。作用Code Review的好处有很多，巴拉巴拉可以说一堆，但总的来说有以下几点：找bug提高代码质量相互学习实践方案Code Review并没有一个标准应该怎么去做，每个公司甚至每个团队可能都有自己的做法，下面我讲3种暂时看到的做用 gerrit之前用过一下，觉得比较麻烦，主要是流程上体验不好，commit 之后要CR通过才能真正的提交到 gitlab，如果进度比较赶或者多人协作，别人需要用到你的代码，这就会带来时间上的拖延Commit + Issue + Label1）添加Project Label：Review Done；2）设置做Code Review的默认分支Default branch，在Project Setting里面修改；3）通知团队，新任务，使用Issue登记内容，代码Commit时，填写“#Num”关联Issue；4）做完Code Review后，在Issue打上标签Review Done，并close issue，完成整个任务的流程；Merge Request + Label在mr里面，reivew完代码直接打上标签；总结我个人推荐方案2我觉得主要区别在CR的时间点上，gerrit 在每一次的提交，这个比较强制了，不够灵活；方案3要在合并到别的分支时；方案2则比较灵活。具体更详细的实践可以参考基于 GitLab 的简单项目管理与协作流程]]></content>
       <categories>
         <category>routine</category>
       </categories>
