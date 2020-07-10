@@ -3,11 +3,15 @@ author: alben.wong
 abbrlink: 9c1674eb
 tags:
   - 规则引擎
+  - rules
 categories:
   - java
-date: 2020-02-20 16:13:00
+  - easyrules
 keywords: easyrules ruleengine
-description: EasyRules是一个简单实用的规则引擎，Rule Engine的作用就是分离判断逻辑和对应的执行逻辑的，即不要写一堆的if...else代码，这样会让人很难理解与维护。EasyRules就可以帮你做到这点。
+description: >-
+  EasyRules是一个简单实用的规则引擎，Rule
+  Engine的作用就是分离判断逻辑和对应的执行逻辑的，即不要写一堆的if...else代码，这样会让人很难理解与维护。EasyRules就可以帮你做到这点。
+date: 2020-02-20 16:13:00
 ---
 ## 概要
 
