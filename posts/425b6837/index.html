@@ -1,0 +1,329 @@
+<!DOCTYPE html><html class="theme-next pisces use-motion" lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="theme-color" content="#222"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="google-site-verification" content="V-ZJGOulkaRpRqqRLAsWlKCWXGC3sHJHsqR5SNu0HBY"><meta name="baidu-site-verification" content="oYV9dShRaO"><link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"><link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css"><link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4"><link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4"><link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4"><link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222"><meta name="keywords" content="分布式事务 2pc tcc saga seata"><meta name="description" content="在微服务架构盛行的情况下，在分布式的多个服务中保证业务的一致性，即分布式事务就显得尤为重要。本文将讲述分布式事务及其解决方案，有XA协议、TCC和Saga事务模型、本地消息表、事务消息和阿里开源的Seata。"><meta name="keywords" content="分布式事务 2pc tcc saga seata"><meta property="og:type" content="article"><meta property="og:title" content="聊一下分布式事务"><meta property="og:url" content="https://albenw.github.io/posts/425b6837/index.html"><meta property="og:site_name" content="Alben&#39;s home"><meta property="og:description" content="在微服务架构盛行的情况下，在分布式的多个服务中保证业务的一致性，即分布式事务就显得尤为重要。本文将讲述分布式事务及其解决方案，有XA协议、TCC和Saga事务模型、本地消息表、事务消息和阿里开源的Seata。"><meta property="og:locale" content="zh-Hans"><meta property="og:image" content="https://albenw.github.io/images/聊一下分布式事务__0.png"><meta property="og:image" content="https://albenw.github.io/images/聊一下分布式事务__1.png"><meta property="og:image" content="https://albenw.github.io/images/聊一下分布式事务__2.png"><meta property="og:image" content="https://albenw.github.io/images/聊一下分布式事务__5.png"><meta property="og:image" content="https://albenw.github.io/images/聊一下分布式事务__3.png"><meta property="og:image" content="https://albenw.github.io/images/聊一下分布式事务__4.png"><meta property="og:image" content="https://albenw.github.io/images/聊一下分布式事务__6.png"><meta property="og:image" content="https://albenw.github.io/images/聊一下分布式事务__7.png"><meta property="og:updated_time" content="2020-07-22T12:00:44.676Z"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="聊一下分布式事务"><meta name="twitter:description" content="在微服务架构盛行的情况下，在分布式的多个服务中保证业务的一致性，即分布式事务就显得尤为重要。本文将讲述分布式事务及其解决方案，有XA协议、TCC和Saga事务模型、本地消息表、事务消息和阿里开源的Seata。"><meta name="twitter:image" content="https://albenw.github.io/images/聊一下分布式事务__0.png"><script type="text/javascript" id="hexo.configurations">var NexT=window.NexT||{},CONFIG={root:"/",scheme:"Pisces",version:"5.1.4",sidebar:{position:"left",display:"post",offset:12,b2t:!1,scrollpercent:!1,onmobile:!1},fancybox:!0,tabs:!0,motion:{enable:!0,async:!1,transition:{post_block:"fadeIn",post_header:"slideDownIn",post_body:"slideDownIn",coll_header:"slideLeftIn",sidebar:"slideUpIn"}},duoshuo:{userId:"0",author:"博主"},algolia:{applicationID:"",apiKey:"",indexName:"",hits:{per_page:10},labels:{input_placeholder:"Search for Posts",hits_empty:"We didn't find any results for the search: ${query}",hits_stats:"${hits} results found in ${time} ms"}}}</script><link rel="canonical" href="https://albenw.github.io/posts/425b6837/"><title>聊一下分布式事务 | Alben's home</title></head><body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans"><div class="container sidebar-position-left page-post-detail"><div class="headband"></div><header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="header-inner"><div class="site-brand-wrapper"><div class="site-meta"><div class="custom-logo-site-title"><a href="/" class="brand" rel="start"><span class="logo-line-before"><i></i></span> <span class="site-title">Alben's home</span> <span class="logo-line-after"><i></i></span></a></div><h1 class="site-subtitle" itemprop="description">在这里，你会了解的更多，更透切</h1></div><div class="site-nav-toggle"><button><span class="btn-bar"></span> <span class="btn-bar"></span> <span class="btn-bar"></span></button></div></div><nav class="site-nav"><ul id="menu" class="menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i><br>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i><br>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i><br>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i><br>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i><br>归档</a></li><li class="menu-item menu-item-guestbook"><a href="/guestbook" rel="section"><i class="menu-item-icon fa fa-fw fa-comment"></i><br>留言</a></li><li class="menu-item menu-item-search"><a href="javascript:;" class="popup-trigger"><i class="menu-item-icon fa fa-search fa-fw"></i><br>搜索</a></li></ul><div class="site-search"><div class="popup search-popup local-search-popup"><div class="local-search-header clearfix"><span class="search-icon"><i class="fa fa-search"></i> </span><span class="popup-btn-close"><i class="fa fa-times-circle"></i></span><div class="local-search-input-wrapper"><input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input"></div></div><div id="local-search-result"></div></div></div></nav></div></header><main id="main" class="main"><div class="main-inner"><div class="content-wrap"><div id="content" class="content"><div id="posts" class="posts-expand"><article class="post post-type-normal" itemscope itemtype="http://schema.org/Article"><div class="post-block"><link itemprop="mainEntityOfPage" href="https://albenw.github.io/posts/425b6837/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="name" content="alben.wong"><meta itemprop="description" content=""><meta itemprop="image" content="/images/avatar.jpeg"></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="Alben's home"></span><header class="post-header"><h2 class="post-title" itemprop="name headline">聊一下分布式事务</h2><div class="post-meta"><span class="post-time"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i> </span><span class="post-meta-item-text">发表于</span> <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-20T16:09:00+08:00">2020-07-20 </time></span><span class="post-category"><span class="post-meta-divider">|</span> <span class="post-meta-item-icon"><i class="fa fa-folder-o"></i> </span><span class="post-meta-item-text">分类于</span> <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/分布式/" itemprop="url" rel="index"><span itemprop="name">分布式</span> </a></span></span><span class="post-comments-count"><span class="post-meta-divider">|</span> <span class="post-meta-item-icon"><i class="fa fa-comment-o"></i> </span><a href="/posts/425b6837/#comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/posts/425b6837/" itemprop="commentCount"></span> </a></span><span id="/posts/425b6837/" class="leancloud_visitors" data-flag-title="聊一下分布式事务"><span class="post-meta-divider">|</span> <span class="post-meta-item-icon"><i class="fa fa-eye"></i> </span><span class="post-meta-item-text">阅读次数&#58;</span> <span class="leancloud-visitors-count"></span></span><div class="post-wordcount"><span class="post-meta-item-icon"><i class="fa fa-file-word-o"></i> </span><span class="post-meta-item-text">字数统计&#58;</span> <span title="字数统计">4.2k 字 </span><span class="post-meta-divider">|</span> <span class="post-meta-item-icon"><i class="fa fa-clock-o"></i> </span><span class="post-meta-item-text">阅读时长 &asymp;</span> <span title="阅读时长">14 分钟</span></div><div class="post-description">在微服务架构盛行的情况下，在分布式的多个服务中保证业务的一致性，即分布式事务就显得尤为重要。本文将讲述分布式事务及其解决方案，有XA协议、TCC和Saga事务模型、本地消息表、事务消息和阿里开源的Seata。</div></div></header><div class="post-body" itemprop="articleBody"><h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>在微服务架构盛行的情况下，在分布式的多个服务中保证业务的一致性，即分布式事务就显得尤为重要。本文将讲述分布式事务及其解决方案，有XA协议、TCC和Saga事务模型、本地消息表、事务消息和阿里开源的Seata。</p><h2 id="分布式事务"><a href="#分布式事务" class="headerlink" title="分布式事务"></a>分布式事务</h2><p>聊什么是分布式事务前，先聊一下我们熟悉的单机事务。所谓单机事务是相对分布式事务来说的，即数据库事务。大家都知道数据库事务有ACID这四个特性：</p><ul><li>A（Atomicity）：指单个事务中的操作要不都执行，要不都不执行</li><li>C（Consistency）：指事务前后数据的完整性必须保持一致</li><li>I（Isolation）：指多个事务对数据可见性的规则</li><li>D（Durability）：指事务提交后，就会被永久存储下来</li></ul><p>既然数据库事务有这四个特性的，那么分布式事务也不例外，应该具备这四个特性。</p><p>在微服务架构下，服务之间通过RPC远程调用，相对单机事务来说，多了“网络通信”这一不确定因素，使得本来服务的调用只有“成功”和“失败”这两种返回结果，变为“成功”、“失败”和“未知”三种返回结果。系统之间的通信可靠性从单一系统中的可靠变成了微服务架构之间的不可靠，分布式事务其实就是在不可靠的通信下实现事务的特性。一般因为网络导致的异常可能有机器宕机、网络异常、消息丢失、消息乱序、数据错误、不可靠的TCP、存储数据丢失、其他异常等等。</p><h2 id="分布式事务方案"><a href="#分布式事务方案" class="headerlink" title="分布式事务方案"></a>分布式事务方案</h2><h3 id="2PC-3PC"><a href="#2PC-3PC" class="headerlink" title="2PC/3PC"></a>2PC/3PC</h3><p>2PC即<a href="[https://zh.wikipedia.org/wiki/%E4%BA%8C%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4](https://zh.wikipedia.org/wiki/二阶段提交">二阶段提交</a>) :</p><blockquote><p>二阶段提交（英语：Two-phase Commit）是指在计算机网络以及数据库领域内，为了使基于分布式系统架构下的所有节点在进行事务提交时保持一致性而设计的一种算法。通常，二阶段提交也被称为是一种协议（Protocol）。</p></blockquote><p>2PC是一种协议，它的作用保证在分布式系统中每个节点要不都提交事务，要么都取消事务。这个跟ACID中的A原子性的定义很像。</p><p>2PC引入一个第三方的节点协调者，即Coordinator，其他参与事务的节点为参与者，即Participants。协调者统筹整个事务行为，负责通知参与者进行Commit还是Rollback操作。</p><p>2PC的过程比较简单，分为两个阶段：</p><ol><li><p>准备阶段</p><p>协调者分别给每个参与者发送Prepare消息，每个参与者收到消息后，进行“预提交”操作（不是实际的提交操作），把操作的结果（成功或失败）返回给协调者。</p></li><li><p>提交阶段</p><p>协调者根据准备阶段收到的参与者的返回结果进行判断，如果所有的参与者都返回成功，那么分别给每个参与者发送Commit消息，否则发送Rollback消息。</p></li></ol><p><img src="/images/聊一下分布式事务__0.png" alt="upload successful"></p><p>2PC是一个强一致性协议，同时它在实际应用中还存在几个问题</p><ul><li>同步阻塞，2PC的两个阶段中，协调者和参与者的通信都是同步的，这会导致整个事务的长时间阻塞</li><li>Coordinator的单点问题</li><li>数据不一致，在Commit阶段，可能存在只有部分参与者收到Commit消息（或处理成功）的情况</li></ul><h4 id="3PC"><a href="#3PC" class="headerlink" title="3PC"></a>3PC</h4><p>3PC即三阶段提交，它比2PC多了一个阶段，即把原来2PC的准备阶段拆分成CanCommit和PreCommit两个阶段，同时</p><p>引入超时机制来解决2PC的同步阻塞问题。</p><p><img src="/images/聊一下分布式事务__1.png" alt="upload successful"></p><p>但是在我看来3PC并没有解决2PC的根本问题，它只是在2PC的基础上做了一些优化，它增加了一个阶段（也增加了1个RTT）来提高对方可用性的概率，这本质跟TCP的三次握手一样，同样也改为四次握手，五次握手等等。</p><h4 id="XA"><a href="#XA" class="headerlink" title="XA"></a>XA</h4><p>XA是一种基于2PC协议实现的规范。在2PC中没有明确资源是什么，以及资源是怎么提交的等等，而XA就是数据库实现2PC的规范，已知常用的支持XA的关系型数据库有Mysql、Oracle等。</p><h3 id="本地消息表"><a href="#本地消息表" class="headerlink" title="本地消息表"></a>本地消息表</h3><p>本地消息表方案应该是业界内使用最为广泛的，因为它使用简单，成本比较低。</p><p>本地消息表的方案最初是由 eBay 提出（<a href="https://queue.acm.org/detail.cfm?id=1394128" rel="external nofollow noopener noreferrer" target="_blank">完整方案</a>），核心思路是将分布式事务拆分成本地事务进行处理。</p><p>它的处理流程如下：</p><ul><li><p>事务发起方把要处理的业务事务和写消息表这两个操作放在同一个本地事务里</p></li><li><p>事务发起方有一个定时任务轮询消息表，把没处理的消息发送到消息中间件</p></li><li><p>事务被动方从消息中间件获取消息后，返回成功</p></li><li><p>事务发起方更新消息状态为已成功</p></li></ul><p><img src="/images/聊一下分布式事务__2.png" alt="upload successful"></p><p>（网图）</p><p>从处理流程来看，本地消息表方案是一个基于消息中间件的可靠性来达到事务的最终一致性的方案。</p><p>一些分析：</p><ul><li><p>把业务处理和写消息表放在同一个事务是为了失败/异常后可以同时回滚</p></li><li><p>为什么不直接发消息，而是先写消息表？</p><p>试想，如果发送消息超时了，即不确定消息中间件收到消息没，那么你是重试还是抛异常回滚事务呢？回滚是不行的，因为可能消息中间件已经收到消息，接收方收到消息后做处理，导致双方数据不一致了；重试也是不行的，因为有可能会一直重试失败，导致事务阻塞。</p></li><li><p>基于上述分析，消息的接收方是需要做幂等操作的</p></li></ul><p>本地消息表方案整体来说还是比较简单、可用的，但是也有以下缺点：</p><ul><li>消息数据和业务数据耦合，消息表需要根据具体的业务场景制定，不能公用。就算可以公用消息表，对于分库的业务来说每个库都是需要消息表的。</li><li>只适用于最终一致的业务场景。例如在 A -&gt; B场景下，在不考虑网络异常、宕机等非业务异常的情况下，A成功的话，B肯定也会成功的。</li></ul><h3 id="事务消息"><a href="#事务消息" class="headerlink" title="事务消息"></a>事务消息</h3><p>事务消息是通过消息中间件来解耦本地消息表和业务数据表，适用于所有对数据最终一致性需求的场景。现在支持事务消息的消息中间件只有RocketMQ，这个概念最早也是RocketMQ提出的。</p><p>通过事务消息实现分布式事务的流程如下：</p><ol><li>发起方发送半事务消息会给RocketMQ ，此时消息的状态prepare，接受方还不能拉取到此消息</li><li>发起方进行本地事务操作</li><li>发起方给RocketMQ确认提交消息，此时接受方可以消费到此消息了</li></ol><p><img src="/images/聊一下分布式事务__5.png" alt="upload successful"></p><p>步骤1和3失败/异常该如何处理：</p><p>RocketMQ会定期扫描还没确认的消息，回调给发送方，询问此次事务的状态，根据发送方的返回结果把这条消息进行取消还是提交确认。</p><p>可以看出事务消息的本质的借鉴了二阶段提交的思想，它跟本地消息表的做法也很像，事务消息做的事情其实就是把消息表的存储和扫描消息表这两个事情放到消息中间件来做，使得消息表和业务表解耦。</p><h3 id="TCC"><a href="#TCC" class="headerlink" title="TCC"></a>TCC</h3><p>TCC （Try-Confirm-Cancel）事务模型采用的是补偿机制，其核心思想是：针对每个操作，都要注册一个与其对应的确认和补偿操作。</p><p>相当于XA来说，TCC可以不依赖于资源管理器，即数据库，它是通过业务逻辑来控制确认和补偿操作的，所以它用了’Cancel’而非’Rollback’的字眼。它是一个应用层面的2PC。</p><p>TCC分为三个阶段：</p><ul><li>Try阶段，对业务资源进行检测和预留</li><li>Confirm阶段，对Try阶段预留的资源进行确认提交，Try阶段执行成功是Confirm阶段执行成功的前提</li><li>Cancel阶段，对Try阶段预留的资源进行撤销或释放</li></ul><p><img src="/images/聊一下分布式事务__3.png" alt="upload successful"></p><p>看上去TCC跟2PC/3PC可能有点像，但是TCC强调的是补偿，而且对于对资源的“预留”，“确认”，“释放”，TCC并没有明确说要如何做，这个具体是要业务来定义的。</p><p>例如在转账的场景，“预留”操作可能就是对账号里的部分资金进行冻结，这样这个资金只能是当前事务才能用，别的事务用不了。</p><p>另外，对于异常的场景，TCC也没有说要怎么做，因为Try、Confirm、Cancel都是业务定义的，这三个阶段中发生了异常，那么就由业务来做相应的处理。一般都有以下几种处理：</p><ul><li>如果Try成功了，那么Confirm阶段异常了就一直重试，直到成功</li><li>Try、Confirm、Cancel三个阶段都有相应的资源及事务日志，应用根据日志（异步）来做重试或补偿</li><li>TCC的实现依赖底层数据库，异常后直接利用数据库的事务机制回滚</li></ul><p>其中现在使用比较多的TCC框架<a href="https://github.com/liuyangming/ByteTCC" rel="external nofollow noopener noreferrer" target="_blank">ByteTCC</a>、<a href="https://github.com/changmingxie/tcc-transaction" rel="external nofollow noopener noreferrer" target="_blank">tcc-transaction</a>的原理都是基于第三点</p><p>同时，在实现TCC时要注意以下三个问题</p><ul><li><p>允许空回滚</p><p>在Try没有真正执行的情况下，触发了Cancel操作，这时要允许Cancel成功</p></li><li><p>防悬挂控制</p><p>Cancel操作比Try操作先执行（网络延迟原因），后面的Try操作不能执行成功</p></li><li><p>幂等控制</p></li></ul><p>TCC其实是把控制事务的逻辑放在业务应用层面，而非资源管理器，这样实现起来就会相对灵活很多，但相对对数据一致性的保证可能没那么强（具体看怎么实现Try），整体来说TCC还有以下缺点：</p><ul><li>对于Confirm和Cancel阶段失败后要完全靠业务应用自己去处理</li><li>每个业务都需要实现Try、Confirm、Cancel三个接口，代码量比较多</li><li>如果是基于现有的业务想使用TCC会比较困难。一是对于原来的接口要拆分为三个接口，入侵性比较大；二是因为要做“预留”资源的操作，有可能需要对原来的业务模型进行改造。</li></ul><h3 id="Saga"><a href="#Saga" class="headerlink" title="Saga"></a>Saga</h3><p>Saga事务模型又叫做长时间运行的事务（Long-running-transaction）, 它是由普林斯顿大学的H.Garcia-Molina等人提出，它描述的是另外一种在没有两阶段提交的的情况下解决分布式系统中复杂的业务事务问题。 <a href="https://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf" rel="external nofollow noopener noreferrer" target="_blank">Saga的论文</a>。</p><p>该模型其核心思想就是拆分分布式系统中的长事务为多个短事务，或者叫多个本地事务，然后由 Saga工作流引擎负责协调，如果整个流程正常结束，那么就算是业务成功完成，如果在这过程中实现失败，那么Saga工作流引擎就会以相反的顺序调用补偿操作，重新进行业务回滚。</p><p>Saga也是一种补偿协议，在 Saga 模式下，分布式事务内有多个参与者，每一个参与者都是一个冲正补偿服务，需要用户根据业务场景实现其正向操作和逆向回滚操作。</p><p><img src="/images/聊一下分布式事务__4.png" alt="overwrote existing file"></p><p>你可以看到Saga跟TCC很像，但是Saga更加宽松，一致性更弱，在Saga看来，在一阶段直接做提交/确认操作就好了，有问题再做补偿。这样的话，Saga可以拥有比XA和TCC更好的性能（XA、TCC需要锁定资源或预留资源），而且Saga强调通过事件驱动异步处理，实现高吞吐。</p><p>可以看出Saga是对TCC的一种“妥协”，从TCC的三个接口变为两个接口，一阶段直接提交缺少对资源的隔离（如果一阶段提交后，后面发现需要做补偿，但是补偿操作执行前有另外的事务更改了数据，这时数据已经变“脏”了，那么这时该如何处理是一个问题。在TCC没有这个问题，因为资源已经被hold住了），因此对使用者也是比较宽松的，对于现有业务的改造也会比较简单。</p><p>Saga实现分两种，一种是Saga状态机实现，一种是Saga AOP Proxy实现。Saga状态机实现，在关于参与者服务编排实现又有集中式和协同式两种分支。这点就不展开了。</p><h4 id="TCC-vs-Saga"><a href="#TCC-vs-Saga" class="headerlink" title="TCC vs Saga"></a>TCC vs Saga</h4><p>TCC和Saga都属于补偿型事务模型，Saga没有Try，直接Commit，所有会产生实际的事务痕迹，而补偿做的是反向操作。TCC是二阶段的广义实现，利用了数据的中间态，Cancel是中间状态的数据进行撤销，从而不存在数据污染问题。</p><p>使用场景对比：</p><ul><li>TCC 适用于执行时间确定且较短、对一致性要求比较高、数据隔离强的业务</li><li>Saga 适用于业务流程长、业务流程多的业务，在银行业金融机构使用广泛</li><li>TCC 对现有业务改造较大，Saga则相对少点</li></ul><h3 id="Seata"><a href="#Seata" class="headerlink" title="Seata"></a>Seata</h3><p><a href="https://github.com/seata/seata" rel="external nofollow noopener noreferrer" target="_blank">Seata</a>是一个由阿里做背书的分布式事务框架，致力于提供高性能和简单易用的分布式事务服务。Seata 将为用户提供了 AT、TCC、SAGA 和 XA 事务模式，为用户打造一站式的分布式解决方案。</p><h4 id="AT模式"><a href="#AT模式" class="headerlink" title="AT模式"></a>AT模式</h4><p>AT模式是Seata通过拦截、解释用户的SQL，对业务数据进行加锁、回滚等操作的基于二阶段协议的一个实现。</p><p>它的特点是对业务无入侵，用户只需关注自己的“业务 SQL”，用户的 “业务 SQL” 作为一阶段，Seata 框架会自动生成事务的二阶段提交和回滚操作。</p><p>在一阶段，Seata 会拦截“业务 SQL”，首先解析 SQL 语义，找到“业务 SQL”要更新的业务数据，在业务数据被更新前，将其保存成“before image”，然后执行“业务 SQL”更新业务数据，在业务数据更新之后，再将其保存成“after image”，最后生成行锁。以上操作全部在一个数据库事务内完成，这样保证了一阶段操作的原子性。</p><p>二阶段如果是提交的话，因为“业务 SQL”在一阶段已经提交至数据库， 所以 Seata 框架只需将一阶段保存的快照数据和行锁删掉，完成数据清理即可。</p><p><img src="/images/聊一下分布式事务__6.png" alt="upload successful"></p><h4 id="TCC模式"><a href="#TCC模式" class="headerlink" title="TCC模式"></a>TCC模式</h4><p>Seata的TCC模式跟上面讲的TCC事务模型差不多</p><p><img src="/images/聊一下分布式事务__7.png" alt="overwrote existing file"></p><h4 id="Saga模式"><a href="#Saga模式" class="headerlink" title="Saga模式"></a>Saga模式</h4><p>Saga模式也是上面讲的Saga事务模型差不多。在Seata中对服务的编排引入了状态机引擎， 使得对业务流程的定义更加标准化，提高可读性，不过相对来说配置会比较复杂繁琐。同时支持注解的方式，这个在开发上会简单一点，但功能可能少一点。</p><h2 id="分布式事务一致性与Paxos一致性的思考"><a href="#分布式事务一致性与Paxos一致性的思考" class="headerlink" title="分布式事务一致性与Paxos一致性的思考"></a>分布式事务一致性与Paxos一致性的思考</h2><p>首先要明确一点的就是对于上述提到的分布式事务解决方案，如TCC、Saga、本地消息表等，其本质都是2PC。</p><p>Paxos算法解决的问题是一个分布式系统如何就某个值（决议）达成一致。</p><p>咋看起来2PC和Paxos都是解决关于“一致性”的问题，其实细想它们解决的问题不在一个层面。</p><p>2PC要求分布式系统中的每个节点要不全部成功，要不全部失败，强调的是原子性。</p><p>Paxos要求多个副本之间的数据一致性，其实这里用“一致性”并不准确，应该用“共识（Consensus）”才对。</p><p>例如2PC中的协调者单点的问题可以用Paxos算法通过选举出新的协调者来解决。</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>总得看来，分布式事务的解决方案都很难做到有高一致性的同时，也有高性能，同时在实现上也有一定的难度。在业务允许的情况下，我们通常处理分布式事务的一般原则应是：业务规避 &gt; 最终一致 &gt; 强一致。</p><h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.sofastack.tech/blog/sofa-meetup-3-seata-retrospect/" rel="external nofollow noopener noreferrer" target="_blank">分布式事务 Seata Saga 模式首秀以及三种模式详解</a></p><p><a href="https://juejin.im/post/5b5a0bf9f265da0f6523913b" rel="external nofollow noopener noreferrer" target="_blank">再有人问你分布式事务，把这篇扔给他</a></p><p><a href="https://www.zhihu.com/question/275845393" rel="external nofollow noopener noreferrer" target="_blank">https://www.zhihu.com/question/275845393</a></p></div><footer class="post-footer"><div class="post-tags"><a href="/tags/分布式事务/" rel="tag"># 分布式事务</a> <a href="/tags/saga/" rel="tag"># saga</a> <a href="/tags/tcc/" rel="tag"># tcc</a> <a href="/tags/seata/" rel="tag"># seata</a> <a href="/tags/2pc/" rel="tag"># 2pc</a></div><div class="post-nav"><div class="post-nav-next post-nav-item"><a href="/posts/f6a7daea/" rel="next" title="Java常见bean mapper的性能及原理分析"><i class="fa fa-chevron-left"></i> Java常见bean mapper的性能及原理分析</a></div><span class="post-nav-divider"></span><div class="post-nav-prev post-nav-item"></div></div></footer></div></article><div class="post-spread"></div></div></div><div class="comments" id="comments"></div></div><div class="sidebar-toggle"><div class="sidebar-toggle-line-wrap"><span class="sidebar-toggle-line sidebar-toggle-line-first"></span> <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span> <span class="sidebar-toggle-line sidebar-toggle-line-last"></span></div></div><aside id="sidebar" class="sidebar"><div class="sidebar-inner"><ul class="sidebar-nav motion-element"><li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">文章目录</li><li class="sidebar-nav-overview" data-target="site-overview-wrap">站点概览</li></ul><section class="site-overview-wrap sidebar-panel"><div class="site-overview"><div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person"><img class="site-author-image" itemprop="image" src="/images/avatar.jpeg" alt="alben.wong"><p class="site-author-name" itemprop="name">alben.wong</p><p class="site-description motion-element" itemprop="description"></p></div><nav class="site-state motion-element"><div class="site-state-item site-state-posts"><a href="/archives/"><span class="site-state-item-count">35</span> <span class="site-state-item-name">日志</span></a></div><div class="site-state-item site-state-categories"><a href="/categories/index.html"><span class="site-state-item-count">15</span> <span class="site-state-item-name">分类</span></a></div><div class="site-state-item site-state-tags"><a href="/tags/index.html"><span class="site-state-item-count">66</span> <span class="site-state-item-name">标签</span></a></div></nav><div class="links-of-author motion-element"><span class="links-of-author-item"><a rel="external nofollow" href="huangyibin1989@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a></span></div></div></section><section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active"><div class="post-toc"><div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概要"><span class="nav-number">1.</span> <span class="nav-text">概要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式事务"><span class="nav-number">2.</span> <span class="nav-text">分布式事务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式事务方案"><span class="nav-number">3.</span> <span class="nav-text">分布式事务方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2PC-3PC"><span class="nav-number">3.1.</span> <span class="nav-text">2PC/3PC</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3PC"><span class="nav-number">3.1.1.</span> <span class="nav-text">3PC</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#XA"><span class="nav-number">3.1.2.</span> <span class="nav-text">XA</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本地消息表"><span class="nav-number">3.2.</span> <span class="nav-text">本地消息表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#事务消息"><span class="nav-number">3.3.</span> <span class="nav-text">事务消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCC"><span class="nav-number">3.4.</span> <span class="nav-text">TCC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Saga"><span class="nav-number">3.5.</span> <span class="nav-text">Saga</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#TCC-vs-Saga"><span class="nav-number">3.5.1.</span> <span class="nav-text">TCC vs Saga</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Seata"><span class="nav-number">3.6.</span> <span class="nav-text">Seata</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#AT模式"><span class="nav-number">3.6.1.</span> <span class="nav-text">AT模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCC模式"><span class="nav-number">3.6.2.</span> <span class="nav-text">TCC模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Saga模式"><span class="nav-number">3.6.3.</span> <span class="nav-text">Saga模式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式事务一致性与Paxos一致性的思考"><span class="nav-number">4.</span> <span class="nav-text">分布式事务一致性与Paxos一致性的思考</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div></div></section></div></aside></div></main><footer id="footer" class="footer"><div class="footer-inner"><div class="copyright">&copy; <span itemprop="copyrightYear">2020</span> <span class="with-love"><i class="fa fa-user"></i> </span><span class="author" itemprop="copyrightHolder">alben.wong</span> <span class="post-meta-divider">|</span> <span class="post-meta-item-icon"><i class="fa fa-area-chart"></i> </span><span class="post-meta-item-text">Site words total count&#58;</span> <span title="Site words total count">96.2k</span></div><div class="powered-by">由 <a rel="external nofollow noopener noreferrer" class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div><span class="post-meta-divider">|</span><div class="theme-info">主题 &mdash; <a rel="external nofollow noopener noreferrer" class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div></div></footer><div class="back-to-top"><i class="fa fa-arrow-up"></i></div></div><script type="text/javascript">"[object Function]"!==Object.prototype.toString.call(window.Promise)&&(window.Promise=null)</script><script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script><script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script><script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script><script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script><script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script><script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script><script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script><script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><script src="//unpkg.com/valine/dist/Valine.min.js"></script><script type="text/javascript">var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'xpCAj9IO0r0lXC1DpoTEPkMY-gzGzoHsz',
+        appKey: 'UinOlExejD79tH248UO6oNIf',
+        placeholder: '走过路过，不留下点什么吗？',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });</script><script type="text/javascript">// Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });</script><script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script><script>AV.initialize("xpCAj9IO0r0lXC1DpoTEPkMY-gzGzoHsz","UinOlExejD79tH248UO6oNIf")</script><script>function showTime(e){var t=new AV.Query(e),c=[],u=$(".leancloud_visitors");u.each(function(){c.push($(this).attr("id").trim())}),t.containedIn("url",c),t.find().done(function(e){var t=".leancloud-visitors-count";if(0!==e.length){for(var n=0;n<e.length;n++){var o=e[n],i=o.get("url"),s=o.get("time"),r=document.getElementById(i);$(r).find(t).text(s)}for(n=0;n<c.length;n++){i=c[n],r=document.getElementById(i);var l=$(r).find(t);""==l.text()&&l.text(0)}}else u.find(t).text(0)}).fail(function(e,t){console.log("Error: "+t.code+" "+t.message)})}function addCount(i){var e=$(".leancloud_visitors"),s=e.attr("id").trim(),r=e.attr("data-flag-title").trim(),t=new AV.Query(i);t.equalTo("url",s),t.find({success:function(e){if(0<e.length){var t=e[0];t.fetchWhenSave(!0),t.increment("time"),t.save(null,{success:function(e){$(document.getElementById(s)).find(".leancloud-visitors-count").text(e.get("time"))},error:function(e,t){console.log("Failed to save Visitor num, with error message: "+t.message)}})}else{var n=new i,o=new AV.ACL;o.setPublicReadAccess(!0),o.setPublicWriteAccess(!0),n.setACL(o),n.set("title",r),n.set("url",s),n.set("time",1),n.save(null,{success:function(e){$(document.getElementById(s)).find(".leancloud-visitors-count").text(e.get("time"))},error:function(e,t){console.log("Failed to create")}})}},error:function(e){console.log("Error:"+e.code+" "+e.message)}})}$(function(){var e=AV.Object.extend("Counter");1==$(".leancloud_visitors").length?addCount(e):1<$(".post-title-link").length&&showTime(e)})</script></body></html>
